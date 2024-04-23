@@ -1,17 +1,20 @@
+    // Fonction pour récupérer les films tendances de la semaine
+    async function fetchTrendingContent(contentType, page) {
+      const options = {
+          method: 'GET',
+          headers: {
+              accept: 'application/json',
+              Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIxNTVjMzIyNTJlZWMzOGIzZTgyNDEwNTI5ZjE2NmE4NyIsInN1YiI6IjY2MjYyOTA1YjlhMGJkMDBjZGQ0MzFlMSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.2Qpy9FgtaQ7Px6SwG910GW8KC7_eiQYMPj8vhp0laPQ'
+          }
+      };
 
-    document.addEventListener('DOMContentLoaded', getMovies);
+      const url = contentType === 'movies' ? 'https://api.themoviedb.org/3/trending/movie/week?language=fr-FR'
 
-    async function getMovies() {
-      const API_KEY = '8c4b867188ee47a1d4e40854b27391ec';
-      const response = await fetch(`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&language=en-US&page=1`);
-      const data = await response.json();
-      const movies = data.results.slice(0, 4); // Get the first four movies
-      
-      const moviesList = document.getElementById('moviesList');
-      movies.forEach(movie => {
-        const li = document.createElement('li');
-        li.textContent = movie.title;
-        moviesList.appendChild(li);
-      });
-    }
-  
+      try {
+          const response = await fetch(url, options);
+          const data = await response.json();
+          processTrendingContent(data, contentType);
+      } catch (error) {
+          console.error(error);
+      }
+  }
