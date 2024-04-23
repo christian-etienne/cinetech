@@ -1,10 +1,10 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
     let currentMoviesPage = 1; // Page actuelle pour les films
     let currentSeriesPage = 1; // Page actuelle pour les séries
     const itemsPerPage = 5; // Nombre d'éléments par page
 
     // Fonction pour récupérer les films et les séries tendances de la semaine
-    function fetchTrendingContent(contentType, page) {
+    async function fetchTrendingContent(contentType, page) {
         const options = {
             method: 'GET',
             headers: {
@@ -15,26 +15,26 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const url = contentType === 'movies' ? 'https://api.themoviedb.org/3/trending/movie/week?language=fr-FR' : 'https://api.themoviedb.org/3/trending/tv/week?language=fr-FR';
 
-        fetch(url, options)
-            .then(response => response.json())
-            .then(data => {
-                // Appelle une fonction pour traiter les données des films ou des séries tendances
-                processTrendingContent(data, contentType);
-            })
-            .catch(err => console.error(err));
+        try {
+            const response = await fetch(url, options);
+            const data = await response.json();
+            processTrendingContent(data, contentType);
+        } catch (error) {
+            console.error(error);
+        }
     }
 
     // Fonction pour traiter les données des films ou des séries tendances
     function processTrendingContent(data, contentType) {
-        const totalItems = data.total_results; // Nombre total d'éléments (films ou séries)
+        const items = data.results || []; // Assurez-vous que items est défini
 
         // Affiche les éléments correspondants (films ou séries)
         if (contentType === 'movies') {
-            displayItems(data.results, 'trending-movies-list', currentMoviesPage, itemsPerPage);
-            displayPagination(totalItems, 'movies-pagination', currentMoviesPage);
+            displayItems(items, 'trending-movies-list', currentMoviesPage, itemsPerPage);
+            displayPagination(data.total_results, 'movies-pagination', 'movies', currentMoviesPage);
         } else {
-            displayItems(data.results, 'trending-series-list', currentSeriesPage, itemsPerPage);
-            displayPagination(totalItems, 'series-pagination', currentSeriesPage);
+            displayItems(items, 'trending-series-list', currentSeriesPage, itemsPerPage);
+            displayPagination(data.total_results, 'series-pagination', 'series', currentSeriesPage);
         }
     }
 
@@ -42,6 +42,9 @@ document.addEventListener('DOMContentLoaded', function() {
     function displayItems(items, containerId, currentPage, itemsPerPage) {
         const container = document.getElementById(containerId);
         container.innerHTML = ''; // Efface le contenu précédent
+
+        // Vérifie si items est un tableau avant d'utiliser slice
+        if (!Array.isArray(items)) return;
 
         // Calcule l'index de début et de fin des éléments à afficher sur la page actuelle
         const startIndex = (currentPage - 1) * itemsPerPage;
@@ -95,40 +98,40 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Fonction pour afficher la pagination
-    function displayPagination(totalItems, containerId, currentPage) {
-        const totalPages = Math.ceil(totalItems / itemsPerPage);
-        const paginationContainer = document.getElementById(containerId);
+function displayPagination(totalItems, containerId, contentType, currentPage) {
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    const paginationContainer = document.getElementById(containerId);
 
-        // Efface le contenu précédent de la pagination
-        paginationContainer.innerHTML = '';
+    // Efface le contenu précédent de la pagination
+    paginationContainer.innerHTML = '';
 
-        // Crée un groupe de pagination Bootstrap
-        const paginationList = document.createElement('ul');
-        paginationList.classList.add('pagination');
+    // Crée un groupe de pagination Bootstrap
+    const paginationList = document.createElement('ul');
+    paginationList.classList.add('pagination');
 
-        // Ajoute un bouton précédent
-        const prevButton = createPaginationButton('Précédent', currentPage - 1, currentPage === 1);
-        paginationList.appendChild(prevButton);
+    // Ajoute un bouton précédent
+    const prevButton = createPaginationButton('Précédent', currentPage - 1, currentPage === 1, contentType);
+    paginationList.appendChild(prevButton);
 
-        // Ajoute un bouton pour chaque page, limité à un maximum de 5 pages
-        for (let i = 1; i <= totalPages && i <= 5; i++) {
-            const pageButton = createPaginationButton(i, i, false);
-            paginationList.appendChild(pageButton);
-        }
-
-        // Ajoute un bouton suivant
-        const nextButton = createPaginationButton('Suivant', currentPage + 1, currentPage === totalPages);
-        paginationList.appendChild(nextButton);
-
-        // Ajoute la liste de pagination au conteneur de pagination
-        paginationContainer.appendChild(paginationList);
+    // Ajoute un bouton pour chaque page, limité à un maximum de 4 pages
+    for (let i = 1; i <= 4 && i <= totalPages; i++) {
+        const pageButton = createPaginationButton(i, i, false, contentType);
+        paginationList.appendChild(pageButton);
     }
 
+    // Ajoute un bouton suivant
+    const nextButton = createPaginationButton('Suivant', currentPage + 1, currentPage === totalPages, contentType);
+    paginationList.appendChild(nextButton);
+
+    // Ajoute la liste de pagination au conteneur de pagination
+    paginationContainer.appendChild(paginationList);
+}
+    
     // Fonction pour créer un bouton de pagination Bootstrap
-    function createPaginationButton(label, page, isDisabled) {
+    function createPaginationButton(label, page, isDisabled, contentType) {
         const listItem = document.createElement('li');
         listItem.classList.add('page-item');
-
+    
         const link = document.createElement('a');
         link.classList.add('page-link');
         link.href = '#';
@@ -137,17 +140,22 @@ document.addEventListener('DOMContentLoaded', function() {
             listItem.classList.add('disabled');
             link.setAttribute('aria-disabled', 'true');
         } else {
-            link.addEventListener('click', function() {
-                currentPage = page;
-                fetchTrendingContent('movies', page);
+            link.addEventListener('click', async function(event) {
+                event.preventDefault(); // Empêche le comportement par défaut du lien
+                if (contentType === 'movies') {
+                    currentMoviesPage = page;
+                } else {
+                    currentSeriesPage = page;
+                }
+                await fetchTrendingContent(contentType, page);
             });
         }
-
+    
         listItem.appendChild(link);
         return listItem;
     }
 
     // Appelle la fonction pour récupérer les films et les séries tendances de la semaine lors du chargement de la page
-    fetchTrendingContent('movies', currentMoviesPage);
-    fetchTrendingContent('series', currentSeriesPage);
+    await fetchTrendingContent('movies', currentMoviesPage);
+    await fetchTrendingContent('series', currentSeriesPage);
 });
