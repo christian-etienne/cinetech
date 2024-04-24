@@ -3,29 +3,39 @@ document.addEventListener('DOMContentLoaded', async function() {
   
     const itemId = getParameterByName('id');
     const itemType = getParameterByName('type');
-  
+
     if (itemId && itemType) {
       try {
         let itemResponse;
+        let contentType;
         if (itemType === 'movies') {
           itemResponse = await fetch(`https://api.themoviedb.org/3/movie/${itemId}?api_key=${apiKey}&language=fr-FR`);
+          contentType = 'movie';
         } else if (itemType === 'series') {
           itemResponse = await fetch(`https://api.themoviedb.org/3/tv/${itemId}?api_key=${apiKey}&language=fr-FR`);
+          contentType = 'tv';
         }
   
         const itemData = await itemResponse.json();
-        const creditsResponse = await fetch(`https://api.themoviedb.org/3/${itemType}/${itemId}/credits?api_key=${apiKey}`);
+        const creditsResponse = await fetch(`https://api.themoviedb.org/3/${contentType}/${itemId}/credits?api_key=${apiKey}`);
         const creditsData = await creditsResponse.json();
+        const reviewsResponse = await fetch(`https://api.themoviedb.org/3/${contentType}/${itemId}/reviews?api_key=${apiKey}&language=fr-FR&page=1`);
+        const reviewsData = await reviewsResponse.json();
   
-        if (creditsResponse.ok) {
+        if (creditsResponse.ok && reviewsResponse.ok) {
           itemData.credits = creditsData;
+          itemData.reviews = reviewsData;
   
           // Mettez à jour les détails liés aux crédits
           document.getElementById('movie-director').textContent = itemData.credits.crew.length > 0 ? `Réalisateur: ${getDirector(itemData.credits.crew)}` : 'Réalisateur inconnu';
           document.getElementById('movie-actors').textContent = itemData.credits.cast.length > 0 ? `Acteurs: ${getActors(itemData.credits.cast)}` : 'Acteurs inconnus';
+  
+          // Affichez les commentaires
+          displayReviews(itemData.reviews.results);
         } else {
-          console.error('Erreur lors de la récupération des crédits du film ou de la série:', creditsResponse.statusText);
+          console.error('Erreur lors de la récupération des crédits ou des commentaires du film ou de la série:', creditsResponse.statusText, reviewsResponse.statusText);
           itemData.credits = { crew: [], cast: [] }; // Provide a default value
+          itemData.reviews = { results: [] }; // Provide a default value
         }
   
         const similarItems = await getSimilarItems(itemData.id, itemType);
@@ -40,10 +50,13 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Fonction pour récupérer les films ou séries similaires
     async function getSimilarItems(itemId, itemType) {
       let similarResponse;
+      let contentType;
       if (itemType === 'movies') {
         similarResponse = await fetch(`https://api.themoviedb.org/3/movie/${itemId}/similar?api_key=${apiKey}&language=fr-FR`);
+        contentType = 'movie';
       } else if (itemType === 'series') {
         similarResponse = await fetch(`https://api.themoviedb.org/3/tv/${itemId}/similar?api_key=${apiKey}&language=fr-FR`);
+        contentType = 'tv';
       }
   
       const similarData = await similarResponse.json();
@@ -139,6 +152,36 @@ document.addEventListener('DOMContentLoaded', async function() {
       }
     }
   
+    // Fonction pour afficher les commentaires
+    function displayReviews(reviews) {
+      const reviewsContainer = document.getElementById('movie-reviews');
+      reviewsContainer.innerHTML = ''; // Effacez les commentaires précédents
+  
+      if (reviews.length > 0) {
+        reviews.forEach(review => {
+          const reviewElement = document.createElement('div');
+          reviewElement.classList.add('review');
+  
+          const authorElement = document.createElement('p');
+          authorElement.classList.add('review-author');
+          authorElement.textContent = `Auteur: ${review.author}`;
+  
+          const contentElement = document.createElement('p');
+          contentElement.classList.add('review-content');
+          contentElement.textContent = review.content;
+  
+          reviewElement.appendChild(authorElement);
+          reviewElement.appendChild(contentElement);
+  
+          reviewsContainer.appendChild(reviewElement);
+        });
+      } else {
+        const noReviewsElement = document.createElement('p');
+        noReviewsElement.textContent = 'Aucun commentaire disponible.';
+        reviewsContainer.appendChild(noReviewsElement);
+      }
+    }
+  
     // Fonction pour extraire le réalisateur à partir de l'équipe
     function getDirector(crew) {
       for(let i = 0; i < crew.length; i++) {
@@ -155,7 +198,7 @@ document.addEventListener('DOMContentLoaded', async function() {
       for(let i = 0; i < cast.length && i < 5; i++) {
         actors += cast[i].name + ', ';
       }
-      return actors.slice(0, -2); // supprime la dernière virgule et l'espace
+      return actors.slice(0, -2); // Supprime la dernière virgule et l'espace
     }
   
     // Fonction pour extraire les genres
@@ -164,7 +207,7 @@ document.addEventListener('DOMContentLoaded', async function() {
       for(let i = 0; i < genres.length; i++) {
         genreList += genres[i].name + ', ';
       }
-      return genreList.slice(0, -2); // supprime la dernière virgule et l'espace
+      return genreList.slice(0, -2); // Supprime la dernière virgule et l'espace
     }
   
     // Fonction pour extraire les paramètres de l'URL
@@ -173,4 +216,3 @@ document.addEventListener('DOMContentLoaded', async function() {
       return urlParams.get(name);
     }
   });
-  
