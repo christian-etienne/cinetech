@@ -2,32 +2,36 @@ document.addEventListener('DOMContentLoaded', function() {
     const apiKey = '155c32252eec38b3e82410529f166a87'; // Remplacez par votre clé API TMDb
     const itemId = getParameterByName('id'); // Fonction pour obtenir le paramètre d'URL 'id'
 
-    // Vérifiez si l'ID est disponible
+    // Vérifiez si l'ID est disponible fr-FR
     if (itemId) {
         // Appeler une fonction pour récupérer les détails du film ou de la série à partir de l'API TMDb
-        fetchItemDetails(itemId);
+        fetchItemDetails(itemId, 'tv'); // for a TV show
+        fetchItemDetails(itemId, 'movie'); // for a movie
     } else {
         console.error('Aucun ID de film ou de série spécifié.');
     }
 
     // Fonction pour récupérer les détails du film ou de la série à partir de l'API TMDb
     async function fetchItemDetails(itemId) {
-        try {
-            const movieResponse = await fetch(`https://api.themoviedb.org/3/movie/${itemId}?api_key=${apiKey}&language=fr-FR`);
-            const movieData = await movieResponse.json();
-    
-            const creditsResponse = await fetch(`https://api.themoviedb.org/3/movie/${itemId}/credits?api_key=${apiKey}`);
-            const creditsData = await creditsResponse.json();
-    
-            movieData.credits = creditsData;
-    
-            // Appeler une fonction pour mettre à jour le contenu de la page HTML avec les détails du film ou de la série
-            updatePageContent(movieData);
-        } catch (error) {
-            console.error('Erreur lors de la récupération des détails du film ou de la série:', error);
-        }
-    }
+    try {
+        const itemResponse = await fetch(`https://api.themoviedb.org/3/movie/${itemId}?api_key=${apiKey}&language=fr-FR`);
+        const itemData = await itemResponse.json();
 
+        const creditsResponse = await fetch(`https://api.themoviedb.org/3/movie/${itemId}/credits?api_key=${apiKey}`);
+        const creditsData = await creditsResponse.json();
+
+        if (creditsResponse.ok) {
+            itemData.credits = creditsData;
+        } else {
+            console.error('Erreur lors de la récupération des crédits du film ou de la série:', creditsResponse.statusText);
+            itemData.credits = { crew: [], cast: [] }; // Provide a default value
+        }
+
+        updatePageContent(itemData);
+    } catch (error) {
+        console.error('Erreur lors de la récupération des détails du film ou de la série:', error);
+    }
+}
     // Fonction pour mettre à jour le contenu de la page HTML avec les détails du film ou de la série
     function updatePageContent(item) {
         // Mettez à jour le titre du film ou de la série
