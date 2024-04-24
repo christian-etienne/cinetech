@@ -54,3 +54,31 @@ footer a {
     color: white;
     text-decoration: none;
 }
+.similar-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 10px;
+  }
+  
+  .similar-item img {
+    width: 150px;
+    height: auto;
+    object-fit: cover;
+    margin-bottom: 10px;
+  }
+  
+  .similar-item-info {
+    text-align: center;
+  }
+  
+  .similar-item-info h3 {
+    margin: 0;
+    font-size: 16px;
+  }
+  
+  .similar-item-info p {
+    margin: 0;
+    font-size: 14px;
+    color: #777;
+  }
