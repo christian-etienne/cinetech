@@ -9,6 +9,7 @@
     <link rel="icon" type="icon/ico" href="assets/images/favicon.ico">
     <!--<link rel="stylesheet" href="assets/css/index.css">-->
     <title>CineFile</title>
+    
 </head>
 <body>
     <header class="p-3 mb-3 border-bottom">
@@ -22,7 +23,8 @@
               <li><a href="films.html" class="nav-link px-2 link-body-emphasis">Films</a></li>
               <li><a href="series.html" class="nav-link px-2 link-body-emphasis">Séries</a></li>
             </ul>
-    
+                <div id="tv-series-list-35" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 row-cols-xxl-5 g-4"></div>
+
             <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search">
                 <input type="search" id="search-input" class="form-control" placeholder="Rechercher..." aria-label="Search">
                 <div id="search-results" class="position-absolute w-100 bg-white mt-1">
@@ -44,11 +46,40 @@
     </div>
     
     <!-- HTML pour afficher les séries populaires -->
-    <div class="container">
-        <h1 class="mt-5">Séries</h1>
-        <div id="tv-series-list-popular" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 row-cols-xxl-5 g-4"></div>
-        <nav id="series-pagination" aria-label="Pagination" class="mt-4 d-flex justify-content-center"></nav>
+    <!-- HTML dla kategorii komedii -->
+    <div>
+        <div class="container">
+            <h1 class="mt-5 mb-2 ">Séries de comédie</h1>
+            <div class="d-flex row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 row-cols-xxl-5 g-4" id="series-container-comedy"></div>
+            <div id="series-pagination-comedy" class="mt-4 d-flex justify-content-center"></div>
+        </div>
+    
+        <!-- HTML dla kategorii akcji i przygody -->
+        <div class="container">
+            <h1 class="mt-5 mb-2">Séries d'action et d'aventure</h1>
+            <div class="d-flex row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 row-cols-xxl-5 g-4 " id="series-container-action_adventure"></div>
+            <div id="series-pagination-action_adventure" class="mt-4 d-"></div>
+        </div>
+    
+        <!-- HTML dla kategorii kryminał -->
+        <div class="container">
+            <h1 class="mt-5 mb-2">Séries de crime</h1>
+            <div class="d-flex row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 row-cols-xxl-5 g-4" id="series-container-crime"></div>
+            <div id="series-pagination-crime" class="mt-4 d-flex justify-content-center"></div>
+        </div>
+    
+        <!-- HTML dla kategorii rodziny -->
+        <div class="container">
+            <h1 class="mt-5 mb-2">Séries familiales</h1>
+            <div class="d-flex row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 row-cols-xxl-5 g-4" id="series-container-family"></div>
+            <div id="series-pagination-family" class="mt-4 d-flex justify-content-center"></div>
+        </div>
     </div>
+    
+    
+
+        
+
     <footer class="py-3 my-4">
         <ul class="nav justify-content-center border-bottom pb-3 mb-3">
           <li class="nav-item"><a href="index.html" class="nav-link px-2 text-body-secondary">Accueil</a></li>
