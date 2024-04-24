@@ -1,13 +1,19 @@
-let currentMoviesPage = 1;
+let currentMoviesPage = {
+    28: 1, // Action
+    35: 1, // Comédie
+    10749: 1, // Romance
+    878: 1, // Science-fiction
+    53: 1 // Thriller
+};
+
 const itemsPerPage = 4; // nombre d'éléments par page
 
 document.addEventListener('DOMContentLoaded', async function () {
-    await fetchMoviesByCategory(28, 1); // Action
-    await fetchMoviesByCategory(35, 1); // Comédie
-    await fetchMoviesByCategory(27, 1); // Horreur
-    await fetchMoviesByCategory(10749, 1); // Romance
-    await fetchMoviesByCategory(878, 1); // Science-fiction
-    await fetchMoviesByCategory(53, 1); // Thriller
+    await fetchMoviesByCategory(28, currentMoviesPage[28]); // Action
+    await fetchMoviesByCategory(35, currentMoviesPage[35]); // Comédie
+    await fetchMoviesByCategory(10749, currentMoviesPage[10749]); // Romance
+    await fetchMoviesByCategory(878, currentMoviesPage[878]); // Science-fiction
+    await fetchMoviesByCategory(53, currentMoviesPage[53]); // Thriller
 });
 
 async function fetchMoviesByCategory(category, page) {
@@ -30,38 +36,20 @@ async function fetchMoviesByCategory(category, page) {
     }
 }
 
-
-
 function processMoviesByCategory(data, category, page) {
     const items = data.results || [];
 
-    // Affiche les éléments correspondants à la catégorie
-    if (category === 28) { // Action
-        displayItems(items, 'action', page, itemsPerPage);
-    } else if (category === 35) { // Comédie
-        displayItems(items, 'comedy', page, itemsPerPage);
-    } else if (category === 10749) { // Romance
-        displayItems(items, 'romance', page, itemsPerPage);
-    } else if (category === 878) { // Science-fiction
-        displayItems(items, 'science-fiction', page, itemsPerPage);
-    } else if (category === 53) { // Thriller
-        displayItems(items, 'thriller', page, itemsPerPage);
-
-    }
-
-    
-
-    // Affiche la pagination
-    displayPagination(data.total_results, `pagination-${category}`, category, page);
+    displayItems(items, category, page);
+    displayPagination(data.total_results, category, page);
 }
 
-// Fonction pour afficher les éléments (films) par page et par catégorie
-function displayItems(items, containerId, currentPage, itemsPerPage) {
+function displayItems(items, category, page) {
+    const containerId = categoryToContainerId(category);
     const container = document.getElementById(containerId);
     container.innerHTML = '';
 
     // Calcule l'index de début et de fin des éléments à afficher sur la page actuelle
-    const startIndex = (currentPage - 1) * itemsPerPage;
+    const startIndex = (page - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
 
     // Récupère seulement les éléments à afficher sur la page actuelle
@@ -116,17 +104,30 @@ function displayItems(items, containerId, currentPage, itemsPerPage) {
     });
 }
 
-// Fonction pour afficher la pagination
-function displayPagination(totalItems, containerId, contentType, currentPage) {
+function categoryToContainerId(category) {
+    switch (category) {
+        case 28:
+            return 'action';
+        case 35:
+            return 'comedy';
+        case 10749:
+            return 'romance';
+        case 878:
+            return 'science-fiction';
+        case 53:
+            return 'thriller';
+        default:
+            return '';
+    }
+}
+
+function displayPagination(totalItems, category, currentPage) {
     const totalPages = Math.ceil(totalItems / itemsPerPage);
-    const paginationContainer = document.getElementById(containerId);
-    
- // Vérifiez si paginationContainer existe avant de continuer
-     if (!paginationContainer) {
-        console.error(`L'élément avec l'ID "${containerId}" n'existe pas.`);
+    const paginationContainer = document.getElementById(`pagination-${category}`);
+    if (!paginationContainer) {
+        console.error(`L'élément avec l'ID "pagination-${category}" n'existe pas.`);
         return;
     }
-
 
     // Efface le contenu précédent de la pagination
     paginationContainer.innerHTML = '';
@@ -136,25 +137,24 @@ function displayPagination(totalItems, containerId, contentType, currentPage) {
     paginationList.classList.add('pagination');
 
     // Ajoute un bouton précédent
-    const prevButton = createPaginationButton('Précédent', currentPage - 1, currentPage === 1, contentType);
+    const prevButton = createPaginationButton('Précédent', category, currentPage - 1, currentPage === 1);
     paginationList.appendChild(prevButton);
 
     // Ajoute un bouton pour chaque page, limité à un maximum de 5 pages
     for (let i = 1; i <= 5 && i <= totalPages; i++) {
-        const pageButton = createPaginationButton(i, i, currentPage === i, contentType);
+        const pageButton = createPaginationButton(i, category, i, currentPage === i);
         paginationList.appendChild(pageButton);
     }
 
     // Ajoute un bouton suivant
-    const nextButton = createPaginationButton('Suivant', currentPage + 1, currentPage === totalPages, contentType);
+    const nextButton = createPaginationButton('Suivant', category, currentPage + 1, currentPage === totalPages);
     paginationList.appendChild(nextButton);
 
     // Ajoute la liste de pagination au conteneur de pagination
     paginationContainer.appendChild(paginationList);
 }
 
-// Fonction pour créer un bouton de pagination Bootstrap
-function createPaginationButton(label, page, isDisabled, contentType) {
+function createPaginationButton(label, category, page, isDisabled) {
     const listItem = document.createElement('li');
     listItem.classList.add('page-item');
 
@@ -167,20 +167,12 @@ function createPaginationButton(label, page, isDisabled, contentType) {
         link.setAttribute('aria-disabled', 'true');
     } else {
         link.addEventListener('click', async function (event) {
-            event.preventDefault(); // Empêche le comportement par défaut du lien
-            currentMoviesPage = page;
-            await fetchMoviesByCategory(contentType, page);
+            event.preventDefault();
+            currentMoviesPage[category] = page;
+            await fetchMoviesByCategory(category, page);
         });
     }
 
     listItem.appendChild(link);
     return listItem;
 }
-
-// Appelle la fonction pour récupérer les films de chaque catégorie
-fetchMoviesByCategory(28, 1); // Action
-fetchMoviesByCategory(35, 1); // Comédie
-fetchMoviesByCategory(27, 1); // Horreur
-fetchMoviesByCategory(10749, 1); // Romance
-fetchMoviesByCategory(878, 1); // Science-fiction
-fetchMoviesByCategory(53, 1); // Thriller
