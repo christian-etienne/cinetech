@@ -1,5 +1,14 @@
 let currentMoviesPage = 1;
-const itemsPerPage = 20; // nombre d'éléments par page
+const itemsPerPage = 4; // nombre d'éléments par page
+
+document.addEventListener('DOMContentLoaded', async function () {
+    await fetchMoviesByCategory(28, 1); // Action
+    await fetchMoviesByCategory(35, 1); // Comédie
+    await fetchMoviesByCategory(27, 1); // Horreur
+    await fetchMoviesByCategory(10749, 1); // Romance
+    await fetchMoviesByCategory(878, 1); // Science-fiction
+    await fetchMoviesByCategory(53, 1); // Thriller
+});
 
 async function fetchMoviesByCategory(category, page) {
     const options = {
@@ -21,14 +30,7 @@ async function fetchMoviesByCategory(category, page) {
     }
 }
 
-document.addEventListener('DOMContentLoaded', async function () {
-    await fetchMoviesByCategory(28, 1); // Action
-    await fetchMoviesByCategory(35, 1); // Comédie
-    await fetchMoviesByCategory(27, 1); // Horreur
-    await fetchMoviesByCategory(10749, 1); // Romance
-    await fetchMoviesByCategory(878, 1); // Science-fiction
-    await fetchMoviesByCategory(53, 1); // Thriller
-});
+
 
 function processMoviesByCategory(data, category, page) {
     const items = data.results || [];
