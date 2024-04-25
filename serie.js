@@ -1,6 +1,11 @@
 document.addEventListener('DOMContentLoaded', async function() {
     let currentSeriesPage = 1;
     const itemsPerPage = 4; 
+
+    const searchInput = document.getElementById('search-input');
+        const searchResultsList = document.getElementById('search-results-list');
+        const searchResultsContainer = document.getElementById('search-results');
+        const searchButton = document.getElementById('search-button');
     
     async function fetchPage(category, page) {
         const options = {
@@ -11,67 +16,100 @@ document.addEventListener('DOMContentLoaded', async function() {
             }
         };
 
- 
-            const searchInput = document.getElementById('search-input');
-            const searchResultsList = document.getElementById('search-results-list');
-            const searchResults = document.getElementById('search-results');
+
         
-            // Funkcja do pobierania wyników wyszukiwania
-            async function fetchSearchResults(query) {
-                const searchUrl = `https://api.themoviedb.org/3/search/movie?api_key=155c32252eec38b3e82410529f166a87&query=${query}`;
-                try {
-                    const response = await fetch(searchUrl);
-                    const data = await response.json();
-                    return data.results;
-                } catch (error) {
-                    console.error('Error fetching search results:', error);
-                    return [];
-                }
+        
+        async function fetchSearchResults(query) {
+            const searchUrl = `https://api.themoviedb.org/3/search/movie?api_key=155c32252eec38b3e82410529f166a87&query=${query}`;
+            try {
+                const response = await fetch(searchUrl);
+                const data = await response.json();
+                return data.results;
+            } catch (error) {
+                console.error('Error fetching search results:', error);
+                return [];
+            }
+        }
+        
+        
+        
+        searchButton.addEventListener('click', async function() {
+            const query = searchInput.value.trim();
+        
+            if (query.length === 0) {
+                searchResultsList.innerHTML = '';
+                searchResultsContainer.style.display = 'none';
+                return;
             }
         
-            // Funkcja do renderowania wyników wyszukiwania
-            function renderSearchResults(results) {
-                searchResultsList.innerHTML = ''; // Wyczyść poprzednie wyniki
+            const results = await fetchSearchResults(query);
+            renderSearchResults(results);
+        });
         
-                results.forEach(result => {
-                    const listItem = document.createElement('li');
-                    listItem.classList.add('list-group-item');
-                    listItem.textContent = result.title;
-                    searchResultsList.appendChild(listItem);
+        
+        function renderSearchResults(results) {
+            searchResultsList.innerHTML = '';
+        
+            results.forEach(result => {
+                const listItem = document.createElement('li');
+                listItem.classList.add('list-group-item');
+                listItem.textContent = result.title;
+                listItem.dataset.id = result.id;
+                listItem.addEventListener('mouseover', function() {
+                    this.style.cursor = 'pointer';
                 });
         
-                if (results.length === 0) {
-                    const noResultsItem = document.createElement('li');
-                    noResultsItem.classList.add('list-group-item', 'text-muted', 'small');
-                    noResultsItem.textContent = 'Brak wyników';
-                    searchResultsList.appendChild(noResultsItem);
-                }
+                listItem.addEventListener('click', function () {
+                    const selectedItemId = this.dataset.id;
+                    window.location.href = `../assets/pages/detail.html?id=${selectedItemId}`;
         
-                searchResults.style.display = results.length ? 'block' : 'none'; // Pokaż lub ukryj wyniki
+                    const listItems = searchResultsList.getElementsByClassName('list-group-item');
+                    for (let i = 0; i < listItems.length; i++) {
+                        listItems[i].style.backgroundColor = '';
+                        listItems[i].style.color = '';
+                    }
+                    this.style.backgroundColor = '#007bff';
+                    this.style.color = 'white';
+                });
+                listItem.style.pointerEvents = 'auto';
+                searchResultsList.appendChild(listItem);
+            });
+            if (results.length === 0) {
+                const noResultsItem = document.createElement('li');
+                noResultsItem.classList.add('list-group-item', 'text-muted', 'small');
+                noResultsItem.textContent = 'pas des resultats';
+                searchResultsList.appendChild(noResultsItem);
             }
         
-            // Obsługa zdarzenia wciśnięcia klawisza w polu wyszukiwania
-            searchInput.addEventListener('input', async function(event) {
-                const query = event.target.value.trim();
+            searchResultsContainer.style.display = results.length ? 'block' : 'none';
+            searchResultsContainer.style.zIndex = results.length ? 9999 : -1; // Add this line to set the z-index of the container
+        }
         
-                if (query.length === 0) {
-                    searchResultsList.innerHTML = ''; // Wyczyść wyniki, jeśli pole wyszukiwania jest puste
-                    searchResults.style.display = 'none';
-                    return;
-                }
         
-                const searchResults = await fetchSearchResults(query);
-                renderSearchResults(searchResults);
-            });
+        searchInput.addEventListener('input', async function(event) {
+            const query = event.target.value.trim();
         
-            // Obsługa kliknięcia wyniku wyszukiwania
-            searchResultsList.addEventListener('click', function(event) {
-                const clickedItem = event.target;
-                const selectedItemText = clickedItem.textContent;
-                searchInput.value = selectedItemText; // Ustaw wartość pola wyszukiwania na kliknięty wynik
-                searchResults.style.display = 'none'; // Ukryj wyniki
-            });
+            if (query.length === 0) {
+                searchResultsList.innerHTML = '';
+                searchResultsContainer.style.display = 'none';
+                return;
+            }
         
+            const results = await fetchSearchResults(query);
+            renderSearchResults(results);
+            searchResultsContainer.style.zIndex = 9999;
+        });
+        
+        searchResultsList.addEventListener('click', function(event) {
+            const clickedItem = event.target;
+            if (clickedItem.tagName.toLowerCase() === 'li') {
+                const selectedItemId = clickedItem.dataset.id; // Get the stored ID
+                window.location.href = `../assets/pages/detail.html?id=${selectedItemId}`; // Navigate to the details page
+            }
+        });
+        
+    
+
         
 
         let url = '';
@@ -205,9 +243,9 @@ document.addEventListener('DOMContentLoaded', async function() {
         return listItem;
     }
 
-    await fetchPage('comedy', currentSeriesPage); // Dodane wywołanie dla kategorii komedii
-    await fetchPage('action_adventure', currentSeriesPage); // Dodane wywołanie dla kategorii akcji i przygody
-    await fetchPage('crime', currentSeriesPage); // Dodane wywołanie dla kategorii kryminał
-    await fetchPage('family', currentSeriesPage); // Dodane wywołanie dla kategorii rodziny
+    await fetchPage('comedy', currentSeriesPage); 
+    await fetchPage('action_adventure', currentSeriesPage); 
+    await fetchPage('crime', currentSeriesPage); 
+    await fetchPage('family', currentSeriesPage); 
 });
             
