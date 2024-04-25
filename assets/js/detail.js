@@ -88,29 +88,25 @@ document.addEventListener('DOMContentLoaded', async function() {
       if (similarItems.length > 0) {
         similarItems.forEach(similarItem => {
           const listItem = document.createElement('div');
-          listItem.className = 'similar-item';
-  
+          listItem.className = 'similar-item d-flex flex-column align-items-center'; // Utilisez les classes Bootstrap
+      
           const itemImage = document.createElement('img');
           itemImage.src = `https://image.tmdb.org/t/p/w500${similarItem.poster_path}`;
           itemImage.alt = type === 'movies' ? similarItem.title : similarItem.name;
-  
-          const itemInfo = document.createElement('div');
-          itemInfo.className = 'similar-item-info';
-  
+      
           const itemTitle = document.createElement('h3');
           itemTitle.textContent = type === 'movies' ? similarItem.title : similarItem.name;
-  
+          itemTitle.className = 'mt-2 w-50 text-center'; // Ajoutez une marge en haut pour l'écart avec l'image
+
           const itemRating = document.createElement('p');
           itemRating.textContent = similarItem.vote_average ? `Note: ${similarItem.vote_average}/10` : 'Note inconnue';
-  
-          itemInfo.appendChild(itemTitle);
-          itemInfo.appendChild(itemRating);
-  
+      
           listItem.appendChild(itemImage);
-          listItem.appendChild(itemInfo);
-  
+          listItem.appendChild(itemTitle);
+          listItem.appendChild(itemRating);
+      
           similarItemsList.appendChild(listItem);
-        });
+      });
   
         // Initialisez le carrousel
         $(document).ready(function() {
