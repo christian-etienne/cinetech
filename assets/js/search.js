@@ -30,6 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const listItem = document.createElement('li');
             listItem.textContent = results[i].title || results[i].name;
             listItem.dataset.id = results[i].id;
+            listItem.classList.add('list-group-item'); // Ajoutez la classe Bootstrap
             listItem.addEventListener('click', function() {
                 const itemId = results[i].id;
                 const itemType = results[i].media_type === 'movie' ? 'movies' : 'series';
