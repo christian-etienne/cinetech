@@ -43,6 +43,67 @@ function processMoviesByCategory(data, category, page) {
     displayPagination(data.total_results, category, page);
 }
 
+async function addToFavorites(movieId) {
+    const listId = 'your_list_id_here'; // Remplacez par l'ID de la liste de favoris
+    const sessionId = 'your_session_id_here'; // Remplacez par l'ID de la session de l'utilisateur connecté
+  
+    const data = {
+      media_id: movieId,
+      media_type: 'movie'
+    };
+  
+    const options = {
+      method: 'POST',
+      headers: {
+        accept: 'application/json',
+        'content-type': 'application/json;charset=utf-8',
+        Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIxNTVjMzIyNTJlZWMzOGIzZTgyNDEwNTI5ZjE2NmE4NyIsInN1YiI6IjY2MjYyOTA1YjlhMGJkMDBjZGQ0MzFlMSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.2Qpy9FgtaQ7Px6SwG910GW8KC7_eiQYMPj8vhp0laPQ' // Remplacez par votre clé d'API TMDB
+      },
+      body: JSON.stringify(data)
+    };
+  
+    const url = `https://api.themoviedb.org/3/list/${listId}/add_item?api_key=your_api_key_here&session_id=${sessionId}`;
+  
+    try {
+      const response = await fetch(url, options);
+      const json = await response.json();
+      console.log(json);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+// le bouton favoris 
+function createFavoriteButton() {
+    const favoriteButton = document.createElement('button');
+    favoriteButton.classList.add('btn', 'btn-secondary', 'favorite-btn');
+    favoriteButton.type = 'button';
+    favoriteButton.innerHTML = '<i class="far fa-heart"></i>';
+
+    favoriteButton.addEventListener('click', function () {
+        toggleFavorite(this);
+    });
+
+    return favoriteButton;
+}
+
+function toggleFavorite(button) {
+    const icon = button.querySelector('i');
+
+    if (icon.classList.contains('far')) {
+        // Le film n'est pas dans la liste des favoris, on l'ajoute
+        icon.classList.remove('far');
+        icon.classList.add('fas');
+        icon.style.color = 'red';
+    } else {
+        // Le film est dans la liste des favoris, on le supprime
+        icon.classList.remove('fas');
+        icon.classList.add('far');
+        icon.style.color = '';
+    }
+}
+
+
 function displayItems(items, category, page) {
     const containerId = categoryToContainerId(category);
     const container = document.getElementById(containerId);
@@ -94,7 +155,14 @@ function displayItems(items, category, page) {
             cardBody.appendChild(rating);
         }
 
+     // Ajoute le bouton favori à la carte
+        const favoriteButton = createFavoriteButton();
+        cardBody.appendChild(favoriteButton);
+ 
         card.appendChild(cardBody);
+ 
+
+        
 
         // Ajoute la carte à la colonne
         col.appendChild(card);
@@ -136,9 +204,7 @@ function displayPagination(totalItems, category, currentPage) {
     const paginationList = document.createElement('ul');
     paginationList.classList.add('pagination');
 
-    // Ajoute un bouton précédent
-    const prevButton = createPaginationButton('Précédent', category, currentPage - 1, currentPage === 1);
-    paginationList.appendChild(prevButton);
+    
 
     // Ajoute un bouton pour chaque page, limité à un maximum de 5 pages
     for (let i = 1; i <= 5 && i <= totalPages; i++) {
@@ -146,10 +212,7 @@ function displayPagination(totalItems, category, currentPage) {
         paginationList.appendChild(pageButton);
     }
 
-    // Ajoute un bouton suivant
-    const nextButton = createPaginationButton('Suivant', category, currentPage + 1, currentPage === totalPages);
-    paginationList.appendChild(nextButton);
-
+    
     // Ajoute la liste de pagination au conteneur de pagination
     paginationContainer.appendChild(paginationList);
 }
