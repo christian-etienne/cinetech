@@ -30,23 +30,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                 return [];
             }
         }
-        
-        
-        
-        searchButton.addEventListener('click', async function() {
-            const query = searchInput.value.trim();
-        
-            if (query.length === 0) {
-                searchResultsList.innerHTML = '';
-                searchResultsContainer.style.display = 'none';
-                return;
-            }
-        
-            const results = await fetchSearchResults(query);
-            renderSearchResults(results);
-        });
-        
-        
+
         function renderSearchResults(results) {
             searchResultsList.innerHTML = '';
         
@@ -55,8 +39,22 @@ document.addEventListener('DOMContentLoaded', async function() {
                 listItem.classList.add('list-group-item');
                 listItem.textContent = result.title;
                 listItem.dataset.id = result.id;
+                let lastHoveredItem = null;
                 listItem.addEventListener('mouseover', function() {
                     this.style.cursor = 'pointer';
+                    if (lastHoveredItem !== null) {
+                        lastHoveredItem.style.backgroundColor = '';
+                        lastHoveredItem.style.color = '';
+                    }
+                    this.style.backgroundColor = '#007bff';
+                    this.style.color = 'white';
+                    lastHoveredItem = this;
+                });
+
+                listItem.addEventListener('mouseout', function () {
+                    this.style.backgroundColor = '';
+                    this.style.color = '';
+                    lastHoveredItem = null;
                 });
         
                 listItem.addEventListener('click', function () {
@@ -68,8 +66,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                         listItems[i].style.backgroundColor = '';
                         listItems[i].style.color = '';
                     }
-                    this.style.backgroundColor = '#007bff';
-                    this.style.color = 'white';
+                    
                 });
                 listItem.style.pointerEvents = 'auto';
                 searchResultsList.appendChild(listItem);
@@ -78,13 +75,17 @@ document.addEventListener('DOMContentLoaded', async function() {
                 const noResultsItem = document.createElement('li');
                 noResultsItem.classList.add('list-group-item', 'text-muted', 'small');
                 noResultsItem.textContent = 'pas des resultats';
-                searchResultsList.appendChild(noResultsItem);
-            }
-        
-            searchResultsContainer.style.display = results.length ? 'block' : 'none';
-            searchResultsContainer.style.zIndex = results.length ? 9999 : -1; // Add this line to set the z-index of the container
+                searchResultsList.appendChild(noResultsItem);  
         }
-        
+        searchResultsContainer.style.display = results.length ? 'block' : 'none';
+            searchResultsContainer.style.zIndex = results.length ? 9999 : -1;
+            searchResultsContainer.style.height = '300px';
+            searchResultsContainer.style.width = '400px';
+            searchResultsContainer.style.overflowY = 'auto';
+            searchResultsContainer.style.position = 'absolute'; // Set the container to absolute positioning
+            searchResultsContainer.style.left = '0'; // Align the container to the left edge of its parent container
+            searchResultsContainer.style.top = '15%';
+    }
         
         searchInput.addEventListener('input', async function(event) {
             const query = event.target.value.trim();
@@ -196,10 +197,21 @@ document.addEventListener('DOMContentLoaded', async function() {
         rating.style.position = 'absolute';
         rating.style.bottom = '0'
 
+        const favoris = document.createElement('img');
+        favoris.classList.add('heart');
+        favoris.src = ' images/heart.jpg ';
+        favoris.style.height = '25px';
+        favoris.style.width = '25px';
+        favoris.style.position = 'absolute';
+        favoris.style.left = '240px';
+
+
+
         cardBody.appendChild(title);
         card.appendChild(image);
         card.appendChild(cardBody);
         cardBody.appendChild(rating);
+        cardBody.appendChild(favoris)
 
         return card;
     }
