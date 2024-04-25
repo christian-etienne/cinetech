@@ -11,6 +11,69 @@ document.addEventListener('DOMContentLoaded', async function() {
             }
         };
 
+ 
+            const searchInput = document.getElementById('search-input');
+            const searchResultsList = document.getElementById('search-results-list');
+            const searchResults = document.getElementById('search-results');
+        
+            // Funkcja do pobierania wyników wyszukiwania
+            async function fetchSearchResults(query) {
+                const searchUrl = `https://api.themoviedb.org/3/search/movie?api_key=155c32252eec38b3e82410529f166a87&query=${query}`;
+                try {
+                    const response = await fetch(searchUrl);
+                    const data = await response.json();
+                    return data.results;
+                } catch (error) {
+                    console.error('Error fetching search results:', error);
+                    return [];
+                }
+            }
+        
+            // Funkcja do renderowania wyników wyszukiwania
+            function renderSearchResults(results) {
+                searchResultsList.innerHTML = ''; // Wyczyść poprzednie wyniki
+        
+                results.forEach(result => {
+                    const listItem = document.createElement('li');
+                    listItem.classList.add('list-group-item');
+                    listItem.textContent = result.title;
+                    searchResultsList.appendChild(listItem);
+                });
+        
+                if (results.length === 0) {
+                    const noResultsItem = document.createElement('li');
+                    noResultsItem.classList.add('list-group-item', 'text-muted', 'small');
+                    noResultsItem.textContent = 'Brak wyników';
+                    searchResultsList.appendChild(noResultsItem);
+                }
+        
+                searchResults.style.display = results.length ? 'block' : 'none'; // Pokaż lub ukryj wyniki
+            }
+        
+            // Obsługa zdarzenia wciśnięcia klawisza w polu wyszukiwania
+            searchInput.addEventListener('input', async function(event) {
+                const query = event.target.value.trim();
+        
+                if (query.length === 0) {
+                    searchResultsList.innerHTML = ''; // Wyczyść wyniki, jeśli pole wyszukiwania jest puste
+                    searchResults.style.display = 'none';
+                    return;
+                }
+        
+                const searchResults = await fetchSearchResults(query);
+                renderSearchResults(searchResults);
+            });
+        
+            // Obsługa kliknięcia wyniku wyszukiwania
+            searchResultsList.addEventListener('click', function(event) {
+                const clickedItem = event.target;
+                const selectedItemText = clickedItem.textContent;
+                searchInput.value = selectedItemText; // Ustaw wartość pola wyszukiwania na kliknięty wynik
+                searchResults.style.display = 'none'; // Ukryj wyniki
+            });
+        
+        
+
         let url = '';
         switch (category) {
           
@@ -77,8 +140,10 @@ document.addEventListener('DOMContentLoaded', async function() {
         image.src = 'https://image.tmdb.org/t/p/w500' + serie.poster_path;
         image.alt = serie.name;
         image.style.height = '400px';
-
-
+        image.style.cursor = 'pointer'; 
+        image.addEventListener('click', function () {
+        window.location.href = `../assets/pages/detail.html?id=${serie.id}`;
+        });
         const cardBody = document.createElement('div');
         cardBody.classList.add('card-body');
 
@@ -90,6 +155,8 @@ document.addEventListener('DOMContentLoaded', async function() {
         const rating = document.createElement('p');
         rating.classList.add('card-text');
         rating.textContent = 'Note: ' + serie.vote_average.toFixed(1);
+        rating.style.position = 'absolute';
+        rating.style.bottom = '0'
 
         cardBody.appendChild(title);
         card.appendChild(image);
