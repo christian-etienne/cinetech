@@ -2,3 +2,10 @@
     background-color: #FFD700; /* Changer la couleur de fond */
     cursor: pointer; /* Changer le curseur en mode pointeur */
 }
+#search-results-list {
+    max-width: 25%; /* Limite la largeur à 90% de la largeur de son conteneur parent */
+    overflow-x: auto; /* Ajoute une barre de défilement horizontale si nécessaire */
+}
+body {
+    overflow-x: hidden; /* Empêche le défilement horizontal de la page */
+}
