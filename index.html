@@ -22,13 +22,19 @@
               <li><a href="assets/pages/films.html" class="nav-link px-2 link-body-emphasis">Films</a></li>
               <li><a href="assets/pages/series.html" class="nav-link px-2 link-body-emphasis">Séries</a></li>
             </ul>
-    
+
             <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" id="search-form" role="search">
                 <input type="search" id="search-input" class="form-control" placeholder="Rechercher..." aria-label="Search">
                 <div id="search-results" class="z-3 position-absolute w-100 mt-1">
                     <ul id="search-results-list" class="list-group"></ul>
                 </div>
             </form>
+
+            <!-- Button trigger modal -->
+            <button id="login-button" type="button" class="btn btn-warning mx-auto" data-bs-toggle="modal" data-bs-target="#staticBackdrop1">
+                Connexion
+            </button>
+
           </div>
         </div>        
     </header>
@@ -42,6 +48,38 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="staticBackdrop1" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog d-flex justify-content-center">
+        <div class="modal-content w-75">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel1">Connexion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form>
+                    <!-- Email input -->
+                    <div data-mdb-input-init class="form-outline mb-4">
+                        <input type="email" id="email-verif" class="form-control" placeholder="email@laplateforme.io" />
+                        <label class="form-label" for="email-verif">Email</label>
+                    </div>
+
+                    <!-- password input -->
+                    <div data-mdb-input-init class="form-outline mb-4">
+                        <input type="password" id="pass-verif" class="form-control" />
+                        <label class="form-label" for="pass-verif">Mot de passe</label>
+                    </div>
+
+                    <!-- Submit button -->
+                    <button id="btn-login" class="btn btn-warning btn-lg btn-block" type="submit">Me connecter</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    </div>
+<!-- Modal -->
+
     <!-- HTML pour afficher les films populaires -->
     <div class="container">
         <h1 class="mt-5">Films Tendances</h1>
@@ -69,5 +107,6 @@
     <script src="assets/js/search.js"></script>
     <script src="assets/js/index.js"></script>
     <script src="assets/js/detail.js"></script>
+    <script src="assets/js/connexion.js" defer></script>
 </body>
 </html>

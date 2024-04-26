@@ -1,0 +1,20 @@
+[
+    {
+      "id": 1,
+      "nom": "Rabischung",
+      "prenom": "Remy",
+      "email": "remy.rabischung@laplateforme.io",
+      "motdepasse": "Plateforme13!",
+      "role": "cinefile",
+      "username": "remyrbs"
+    },
+    {
+      "id": 2,
+      "nom": "Kies",
+      "prenom": "WIlliam",
+      "email": "william.kies@laplateforme.io",
+      "motdepasse": "Plateforme13!",
+      "role": "cinefile",
+      "username": "williamkies"
+    }
+  ]
