@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', async function() {
     let currentMoviesPage = 1; // Page actuelle pour les films
     let currentSeriesPage = 1; // Page actuelle pour les séries
-    const itemsPerPage = 5; // Nombre d'éléments par page
+    const itemsPerPage = 4; // Nombre d'éléments par page
 
     async function fetchTrendingContent(contentType, page) {
       const options = {
