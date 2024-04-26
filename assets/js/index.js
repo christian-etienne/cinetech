@@ -109,7 +109,7 @@ document.addEventListener('DOMContentLoaded', async function() {
       const paginationList = document.createElement('ul');
       paginationList.classList.add('pagination');
 
-      const numPagesToShow = Math.min(4, totalPages);
+      const numPagesToShow = Math.min(5, totalPages);
 
       for (let i = 1; i <= numPagesToShow; i++) {
         const pageButton = createPaginationButton(i, i, false, contentType);
