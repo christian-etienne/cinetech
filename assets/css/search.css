@@ -1,0 +1,4 @@
+.list-group-item:hover {
+    background-color: #FFD700; /* Changer la couleur de fond */
+    cursor: pointer; /* Changer le curseur en mode pointeur */
+}

@@ -222,6 +222,10 @@ function displayPagination(totalItems, category, currentPage) {
 
     // Ajoute la liste de pagination au conteneur de pagination
     paginationContainer.appendChild(paginationList);
+    
+    paginationContainer.style.marginTop = '20px';
+    paginationContainer.style.display = 'flex'; // Ajoutez cette ligne
+    paginationContainer.style.justifyContent = 'center'; // Modifiez cette ligne
 }
 
 function createPaginationButton(label, category, page, isDisabled) {
