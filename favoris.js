@@ -9,7 +9,7 @@ async function fetchFavoriteMovies() {
 
 function processFavoriteMovies(items) {
     // Sélection de la section des films dans le DOM
-    const filmSection = document.querySelector('.category_films .container');
+    const filmSection = document.querySelector('.category_filmsserie .container');
 
     // Vidage de la section des films
     filmSection.innerHTML = '';
