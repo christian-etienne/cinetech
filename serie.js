@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', async function() {
     let currentSeriesPage = 1;
-    const itemsPerPage = 5; 
+    const itemsPerPage = 4; 
 
     const searchInput = document.getElementById('search-input');
         const searchResultsList = document.getElementById('search-results-list');
@@ -143,15 +143,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         displaySeries(series, category);
         displayPagination(data.total_results, category, currentSeriesPage);
       }
-      async function addToFavorites(serieId) {
-        const listId = 'your_list_id_here'; // Remplacez par l'ID de la liste de favoris
-        const sessionId = 'your_session_id_here'; // Remplacez par l'ID de la session de l'utilisateur connecté
-      
-        const data = {
-          media_id: serieId,
-          media_type: 'serie'
-        };
-      }    
+     
     
     function createFavoriteButton() {
         const favoriteButton = document.createElement('button');
@@ -176,8 +168,10 @@ document.addEventListener('DOMContentLoaded', async function() {
             icon.classList.add('fas');
             icon.style.color = 'red';
 
-            const serieId = button.parentElement.parentElement.querySelector('.card-img-top').dataset.id;
-            addToFavorites(serieId);
+            const serieId = button.parentElement.parentElement.querySelector('.card-img-top').src;
+
+            const serieName = button.parentElement.parentElement.querySelector('.card-title').textContent;
+            addToFavorites(serieId, serieName);
         } else {
             icon.classList.remove('fas');
             icon.classList.add('far');
@@ -188,23 +182,20 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
     }
     
-    function addToFavorites(serieId) {
-        const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-        if (!favorites.includes(serieId)) {
-            favorites.push(serieId);
-            localStorage.setItem('favorites', JSON.stringify(favorites));
-        }
-        
+    function addToFavorites(serieId, serieName) {
+        const favorites = JSON.parse(localStorage.getItem('favorites')) || {};
+        favorites[serieName] = serieId;
+        localStorage.setItem('favorites', JSON.stringify(favorites));
     }
     
     function removeFromFavorites(serieId) {
-        const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-        const index = favorites.indexOf(serieId);
-        if (index !== -1) {
-            favorites.splice(index, 1);
+        const favorites = JSON.parse(localStorage.getItem('favorites')) || {};
+        if (favorites.hasOwnProperty(serieId)) {
+            delete favorites[serieId];
             localStorage.setItem('favorites', JSON.stringify(favorites));
         }
     }
+    
     function categoryToContainerId(category) {
         switch (category) {
           case 'comedy':
