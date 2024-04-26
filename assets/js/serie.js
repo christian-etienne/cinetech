@@ -74,14 +74,6 @@ document.addEventListener('DOMContentLoaded', async function() {
             noResultsItem.textContent = 'pas des resultats';
             searchResultsList.appendChild(noResultsItem);  
     }
-        searchResultsContainer.style.display = results.length ? 'block' : 'none';
-        searchResultsContainer.style.zIndex = results.length ? 9999 : -1;
-        searchResultsContainer.style.height = '300px';
-        searchResultsContainer.style.width = '400px';
-        searchResultsContainer.style.overflowY = 'auto';
-        searchResultsContainer.style.position = 'absolute'; 
-        searchResultsContainer.style.left = '0'; 
-        searchResultsContainer.style.top = '15%';
     }
         
     searchInput.addEventListener('input', async function(event) {
