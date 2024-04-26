@@ -96,7 +96,17 @@ function createFavoriteButton(item) {
     const favoriteButton = document.createElement('button');
     favoriteButton.classList.add('btn', 'btn-secondary', 'favorite-btn');
     favoriteButton.type = 'button';
-    favoriteButton.innerHTML = '<i class="far fa-heart"></i>';
+
+    // Vérifie si le film est déjà dans les favoris
+    const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+    const isFavorite = favorites.some(favorite => favorite.id === item.id);
+
+    if (isFavorite) {
+        // Le film est déjà dans les favoris, change la couleur du bouton en rouge
+        favoriteButton.innerHTML = '<i class="fas fa-heart" style="color: red;"></i>';
+    } else {
+        favoriteButton.innerHTML = '<i class="far fa-heart"></i>';
+    }
 
     favoriteButton.addEventListener('click', function () {
         toggleFavorite(this, item);
