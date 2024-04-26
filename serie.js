@@ -159,41 +159,59 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     function toggleFavorite(button) {
         console.log('Button clicked:', button);
-    
-   
+      
         const icon = button.querySelector('i');
         console.log('Icon found:', icon);
         if (icon.classList.contains('far')) {
-            icon.classList.remove('far');
-            icon.classList.add('fas');
-            icon.style.color = 'red';
-
-            const serieId = button.parentElement.parentElement.querySelector('.card-img-top').src;
-
-            const serieName = button.parentElement.parentElement.querySelector('.card-title').textContent;
-            addToFavorites(serieId, serieName);
+          icon.classList.remove('far');
+          icon.classList.add('fas');
+          icon.style.color = 'red';
+      
+          const serieId = button.parentElement.parentElement.querySelector('.card-img-top').dataset.id;
+          const serieName = button.parentElement.parentElement.querySelector('.card-title').textContent;
+          const posterPath = button.parentElement.parentElement.querySelector('.card-img-top').src;
+          addToFavorites(serieId, serieName, posterPath);
         } else {
-            icon.classList.remove('fas');
-            icon.classList.add('far');
-            icon.style.color = '';
-          
-            const serieId = button.parentElement.parentElement.querySelector('.card-img-top').dataset.id;
-            removeFromFavorites(serieId);
+          icon.classList.remove('fas');
+          icon.classList.add('far');
+          icon.style.color = '';
+      
+          const serieId = button.parentElement.parentElement.querySelector('.card-img-top').dataset.id;
+          removeFromFavorites(serieId);
         }
-    }
+      }
+      
+    function addToFavorites(serieId, serieName, posterPath) {
+        // Pobranie aktualnej listy ulubionych seriali z localStorage
+        const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
     
-    function addToFavorites(serieId, serieName) {
-        const favorites = JSON.parse(localStorage.getItem('favorites')) || {};
-        favorites[serieName] = serieId;
-        localStorage.setItem('favorites', JSON.stringify(favorites));
-    }
+        // Sprawdzenie, czy dany serial już istnieje na liście ulubionych
+        const existingFavorite = favorites.find(favorite => favorite.id === serieId);
     
-    function removeFromFavorites(serieId) {
-        const favorites = JSON.parse(localStorage.getItem('favorites')) || {};
-        if (favorites.hasOwnProperty(serieId)) {
-            delete favorites[serieId];
+        // Jeśli serial nie istnieje na liście ulubionych, dodaj go
+        if (!existingFavorite) {
+            favorites.push({
+                id: serieId,
+                name: serieName,
+                poster_path: posterPath
+            });
+    
+            // Zapisanie zaktualizowanej listy ulubionych seriali do localStorage
             localStorage.setItem('favorites', JSON.stringify(favorites));
         }
+    }
+    
+    
+    
+    function removeFromFavorites(serieId) {
+        // Pobranie aktualnej listy ulubionych seriali z localStorage
+        let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+    
+        // Usunięcie serialu o podanym id z listy ulubionych
+        favorites = favorites.filter(serie => serie.id !== serieId);
+    
+        // Zapisanie zaktualizowanej listy ulubionych seriali do localStorage
+        localStorage.setItem('favorites', JSON.stringify(favorites));
     }
     
     function categoryToContainerId(category) {
