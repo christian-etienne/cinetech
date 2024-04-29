@@ -86,3 +86,4 @@ function removeFavoriteMovie(movieId) {
     // Met à jour le localStorage
     localStorage.setItem('favorites', JSON.stringify(favorites));
 }
+

@@ -2,11 +2,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     let currentSeriesPage = 1;
     const itemsPerPage = 4; 
 
-    const searchInput = document.getElementById('search-input');
-        const searchResultsList = document.getElementById('search-results-list');
-        const searchResultsContainer = document.getElementById('search-results');
-        const searchButton = document.getElementById('search-button');
-    
+   
     async function fetchPage(category, page) {
         const options = {
             method: 'GET',
@@ -16,87 +12,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             }
         };
 
-        async function fetchSearchResults(query) {
-            const searchUrl = `https://api.themoviedb.org/3/search/movie?api_key=155c32252eec38b3e82410529f166a87&query=${query}`;
-            try {
-                const response = await fetch(searchUrl);
-                const data = await response.json();
-                return data.results;
-            } catch (error) {
-                console.error('Error fetching search results:', error);
-                return [];
-            }
-        }
-
-    function renderSearchResults(results) {
-        searchResultsList.innerHTML = '';
-    
-        results.forEach(result => {
-            const listItem = document.createElement('li');
-            listItem.classList.add('list-group-item');
-            listItem.textContent = result.title;
-            listItem.dataset.id = result.id;
-            let lastHoveredItem = null;
-            listItem.addEventListener('mouseover', function() {
-                this.style.cursor = 'pointer';
-                if (lastHoveredItem !== null) {
-                    lastHoveredItem.style.backgroundColor = '';
-                    lastHoveredItem.style.color = '';
-                }
-                this.style.backgroundColor = '#007bff';
-                this.style.color = 'white';
-                lastHoveredItem = this;
-            });
-
-            listItem.addEventListener('mouseout', function () {
-                this.style.backgroundColor = '';
-                this.style.color = '';
-                lastHoveredItem = null;
-            });
-    
-            listItem.addEventListener('click', function () {
-                const selectedItemId = this.dataset.id;
-                window.location.href = `../assets/pages/detail.html?id=${selectedItemId}`;
-    
-                const listItems = searchResultsList.getElementsByClassName('list-group-item');
-                for (let i = 0; i < listItems.length; i++) {
-                    listItems[i].style.backgroundColor = '';
-                    listItems[i].style.color = '';
-                }
-                
-            });
-            listItem.style.pointerEvents = 'auto';
-            searchResultsList.appendChild(listItem);
-        });
-        if (results.length === 0) {
-            const noResultsItem = document.createElement('li');
-            noResultsItem.classList.add('list-group-item', 'text-muted', 'small');
-            noResultsItem.textContent = 'pas des resultats';
-            searchResultsList.appendChild(noResultsItem);  
-    }
-    }
         
-    searchInput.addEventListener('input', async function(event) {
-        const query = event.target.value.trim();
-    
-        if (query.length === 0) {
-            searchResultsList.innerHTML = '';
-            searchResultsContainer.style.display = 'none';
-            return;
-        }
-    
-        const results = await fetchSearchResults(query);
-        renderSearchResults(results);
-        searchResultsContainer.style.zIndex = 9999;
-    });
-        
-    searchResultsList.addEventListener('click', function(event) {
-        const clickedItem = event.target;
-        if (clickedItem.tagName.toLowerCase() === 'li') {
-            const selectedItemId = clickedItem.dataset.id;
-            window.location.href = `../assets/pages/detail.html?id=${selectedItemId}`;
-        }
-    });
     
     let url = '';
     switch (category) {
@@ -137,65 +53,29 @@ document.addEventListener('DOMContentLoaded', async function() {
       }
      
     
-    function createFavoriteButton() {
-        const favoriteButton = document.createElement('button');
-        favoriteButton.classList.add('btn', 'btn-secondary', 'favorite-btn');
-        favoriteButton.type = 'button';
-        favoriteButton.innerHTML = '<i class="far fa-heart"></i>';
-        favoriteButton.addEventListener('click', function () {
-            toggleFavorite(this);
-        });
-    
-        return favoriteButton;
-    }
+   
 
-    function toggleFavorite(button) {
-        console.log('Button clicked:', button);
+   
       
-        const icon = button.querySelector('i');
-        console.log('Icon found:', icon);
-        if (icon.classList.contains('far')) {
-          icon.classList.remove('far');
-          icon.classList.add('fas');
-          icon.style.color = 'red';
-      
-          const serieId = button.parentElement.parentElement.querySelector('.card-img-top').dataset.id;
-          const serieName = button.parentElement.parentElement.querySelector('.card-title').textContent;
-          const posterPath = button.parentElement.parentElement.querySelector('.card-img-top').src;
-          addToFavorites(serieId, serieName, posterPath);
-        } else {
-          icon.classList.remove('fas');
-          icon.classList.add('far');
-          icon.style.color = '';
-      
-          const serieId = button.parentElement.parentElement.querySelector('.card-img-top').dataset.id;
-          removeFromFavorites(serieId);
-        }
-      }
-      
-    function addToFavorites(serieId, serieName, posterPath) {
+    function addToFavorites(serie) {
         // Pobranie aktualnej listy ulubionych seriali z localStorage
         const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
     
         // Sprawdzenie, czy dany serial już istnieje na liście ulubionych
-        const existingFavorite = favorites.find(favorite => favorite.id === serieId);
+        const existingFavorite = favorites.some(favorite => favorite.id === serie.id);
     
         // Jeśli serial nie istnieje na liście ulubionych, dodaj go
         if (!existingFavorite) {
-            favorites.push({
-                id: serieId,
-                name: serieName,
-                poster_path: posterPath
-            });
-    
-            // Zapisanie zaktualizowanej listy ulubionych seriali do localStorage
+            // Ajoute le film aux favoris
+            favorites.push(serie);
+            // Met à jour le localStorage
             localStorage.setItem('favorites', JSON.stringify(favorites));
         }
     }
     
     
     
-    function removeFromFavorites(serieId) {
+    function removeFromFavoriteserie(serieId) {
         // Pobranie aktualnej listy ulubionych seriali z localStorage
         let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
     
@@ -204,6 +84,50 @@ document.addEventListener('DOMContentLoaded', async function() {
     
         // Zapisanie zaktualizowanej listy ulubionych seriali do localStorage
         localStorage.setItem('favorites', JSON.stringify(favorites));
+    }
+
+    function toggleFavorite(button, item) {
+        console.log('Button clicked:', button);
+      
+        const icon = button.querySelector('i');
+        console.log('Icon found:', icon);
+        if (icon.classList.contains('far')) {
+          icon.classList.remove('far');
+          icon.classList.add('fas');
+          icon.style.color = 'red';
+          addToFavorites(item);
+      
+          
+        } else {
+          icon.classList.remove('fas');
+          icon.classList.add('far');
+          icon.style.color = '';
+      
+         
+          removeFromFavoriteserie(item.id);
+        }
+      }
+
+      function createFavoriteButton(item) {
+        const favoriteButton = document.createElement('button');
+        favoriteButton.classList.add('btn', 'btn-secondary', 'favorite-btn');
+        favoriteButton.type = 'button';
+
+        const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+        const isFavorite = favorites.some(favorite => favorite.id === item.id);
+    
+        if (isFavorite) {
+            // Le film est déjà dans les favoris, change la couleur du bouton en rouge
+            favoriteButton.innerHTML = '<i class="fas fa-heart" style="color: red;"></i>';
+        } else {
+            favoriteButton.innerHTML = '<i class="far fa-heart"></i>';
+        }
+    
+        favoriteButton.addEventListener('click', function () {
+            toggleFavorite(this, item);
+        });
+    
+        return favoriteButton;
     }
     
     function categoryToContainerId(category) {
@@ -221,60 +145,62 @@ document.addEventListener('DOMContentLoaded', async function() {
             return null;
         }
       }
-    function displaySeries(series, category, page) {
-        
+      function displaySeries(series, category, page) {
         const containerId = categoryToContainerId(category);
         const container = document.getElementById(containerId);
         container.innerHTML = '';
-        
+    
         const startIndex = (currentSeriesPage - 1) * itemsPerPage;
         const endIndex = startIndex + itemsPerPage;
         const seriesToDisplay = series.slice(startIndex, endIndex);
-  
+    
         seriesToDisplay.forEach(serie => {
-        const col = document.createElement('div');
-        col.classList.add('col');
-
-        const card = document.createElement('div');
-        card.classList.add('card', 'h-100');
-
-        const image = document.createElement('img');
-        image.classList.add('card-img-top');
-        image.src = 'https://image.tmdb.org/t/p/w500' + serie.poster_path;
-        image.alt = serie.name;
-        image.style.height = '400px'
-        image.style.cursor = 'pointer'; 
-        image.addEventListener('click', function () {
-            window.location.href = `../assets/pages/detail.html?id=${serie.id}`;
-    });
-        card.appendChild(image);
-
-        const cardBody = document.createElement('div');
-        cardBody.classList.add('card-body');
-
-        const title = document.createElement('h5');
-        title.classList.add('card-title');
-        title.textContent = serie.name;
-        cardBody.appendChild(title);
-
-        const rating = document.createElement('p');
-        rating.classList.add('card-text');
-        rating.textContent = 'Note: ' + serie.vote_average.toFixed(1);
-        rating.style.position = 'absolute';
-        rating.style.bottom = '0';
-        rating.style.left = '80px';
-        cardBody.appendChild(rating);
-
-        const favoriteButton = createFavoriteButton();
-        cardBody.appendChild(favoriteButton);
-        card.appendChild(cardBody);
-
-        col.appendChild(card);
-
-        container.appendChild(col);
-
+            if (serie) {
+                const col = document.createElement('div');
+                col.classList.add('col');
+    
+                const card = document.createElement('div');
+                card.classList.add('card', 'h-100');
+    
+                const image = document.createElement('img');
+                image.classList.add('card-img-top');
+                image.src = 'https://image.tmdb.org/t/p/w500' + serie.poster_path;
+                image.alt = serie.name;
+                image.style.height = '400px';
+                image.style.cursor = 'pointer';
+                image.addEventListener('click', function () {
+                    // Dodajemy parametr "type=series" do adresu URL
+                    window.location.href = `http://127.0.0.1:5500/assets/pages/detail.html?id=${serie.id}&type=series`;
+                });
+                card.appendChild(image);
+    
+                const cardBody = document.createElement('div');
+                cardBody.classList.add('card-body');
+    
+                const title = document.createElement('h5');
+                title.classList.add('card-title');
+                title.textContent = serie.name;
+                cardBody.appendChild(title);
+    
+                const rating = document.createElement('p');
+                rating.classList.add('card-text');
+                rating.textContent = 'Note: ' + serie.vote_average.toFixed(1);
+                rating.style.position = 'absolute';
+                rating.style.bottom = '0';
+                rating.style.left = '80px';
+                cardBody.appendChild(rating);
+    
+                // Przekazujemy typ zawartości (series) do funkcji createFavoriteButton
+                const favoriteButton = createFavoriteButton(serie, 'series');
+                cardBody.appendChild(favoriteButton);
+                card.appendChild(cardBody);
+    
+                col.appendChild(card);
+                container.appendChild(col);
+            }
         });
-    }    
+    }
+    
     function displayPagination(totalItems, category, currentPage) {
         const totalPages = Math.ceil(totalItems / itemsPerPage);
         const paginationContainerId = `series-pagination-${category}`;

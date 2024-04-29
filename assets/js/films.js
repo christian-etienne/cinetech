@@ -144,7 +144,7 @@ function displayItems(items, category, page) {
         image.style.cursor = 'pointer'; // Change le curseur pour indiquer que l'image est cliquable
         image.addEventListener('click', function () {
             // Redirige l'utilisateur vers la page de détails avec l'ID du film ou de la série comme paramètre d'URL
-            window.location.href = `../assets/pages/detail.html?id=${item.id}`;
+            window.location.href = `http://127.0.0.1:5500/assets/pages/detail.html?id=${item.id}`;
         });
         card.appendChild(image);
 
